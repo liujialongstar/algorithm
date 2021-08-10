@@ -16,7 +16,36 @@ public class RedBlackBinarySearchTree<K extends Comparable<K>, V> implements Ord
      */
     @Override
     public void put(K key, V val) {
+        put(root, key, val);
+        root.color = BLACK;
+    }
 
+    private Node put(Node h, K key, V val){
+        if(h == null) {
+            return new Node(key, val, 1, RED);
+        }
+
+        int cmp = key.compareTo(h.key);
+        if(cmp < 0) {
+            h.left = put(h.left, key, val);
+        }else if(cmp > 0) {
+            h.right = put(h.right, key, val);
+        }else {
+            h.val = val;
+        }
+
+        if(isRed(h.right) && !isRed(h.left)){
+            h = rotateLeft(h);
+        }
+        if(isRed(h.left) && isRed(h.left.left)){
+            h = rotateRight(h);
+        }
+        if(isRed(h.left) && isRed(h.right)) {
+            flipColors(h);
+        }
+
+        h.N = 1 + size(h.left) + size(h.right);
+        return h;
     }
 
     /**
@@ -262,5 +291,15 @@ public class RedBlackBinarySearchTree<K extends Comparable<K>, V> implements Ord
         x.N = h.N;
         h.N = 1 + size(h.left) + size(h.right);
         return x;
+    }
+
+    /**
+     * 颜色转换
+     * @param h
+     */
+    private void flipColors(Node h) {
+        h.color = RED;
+        h.left.color = BLACK;
+        h.right.color = BLACK;
     }
 }
